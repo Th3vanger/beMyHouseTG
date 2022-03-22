@@ -38,7 +38,7 @@ async function analyzeFeed(){
 }
 const bot = new Composer()
 bot.start((ctx) => {
-   client.connect();
+   //client.connect();
    // client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
    //    if (err) throw err;
    //    for (let row of res.rows) {
@@ -50,4 +50,11 @@ bot.start((ctx) => {
    ctx.reply("girolamo")
       
 })
+bot.hears('/getFeed', async ({ reply }) => {
+   const test = await analyzeFeed()
+   console.log(test.length)
+   reply(test.length)
+})
 module.exports = bot
+
+
