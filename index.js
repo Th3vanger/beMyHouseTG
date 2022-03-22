@@ -2,8 +2,17 @@ let Parser = require('rss-parser');
 let parser = new Parser();
 const { Composer } = require('micro-bot');
 require('dotenv').config()
-const { Pool, Client } = require('pg')
-const connectionString = process.env.DATABASE_URL
+const { Client } = require('pg');
+
+const client = new Client({
+  connectionString: process.env.DATABASE_URL,
+  ssl: {
+    rejectUnauthorized: false
+  }
+});
+
+
+
 
 async function analyzeFeed(){
     let feed= []
@@ -29,7 +38,16 @@ async function analyzeFeed(){
 }
 const bot = new Composer()
 bot.start((ctx) => {
+   client.connect();
+   client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
+      if (err) throw err;
+      for (let row of res.rows) {
+         ctx.reply(JSON.stringify(row))
+      // console.log(JSON.stringify(row));
+      }
+      client.end();
+   });
 
-      ctx.reply('Welcome')
+      
 })
 module.exports = bot
