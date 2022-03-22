@@ -1,7 +1,7 @@
 let Parser = require('rss-parser');
 let parser = new Parser();
 const { Telegraf } = require('telegraf')
-
+require('dotenv').config()
 async function analyzeFeed(){
     let feed= []
     let boolEnd = false
@@ -13,7 +13,7 @@ async function analyzeFeed(){
             if (count > 1 ) url = `${baseUrl}&pag=${count}`
             const result =  await parser.parseURL(url);
             feed.push(...result.items)
-         
+         console.log("test")
          } catch (error) {
             boolEnd = true
          }
@@ -24,6 +24,6 @@ async function analyzeFeed(){
    return feed
 
 }
-const bot = new Telegraf('5281784241:AAEqU3qH-yDsgWy5uEDGZHEbKcymjeiq-5s')//process.env.BOT_TOKEN)
+const bot = new Telegraf(process.env.BOT_TOKEN)
 bot.start((ctx) => ctx.reply('Welcome'))
 bot.launch()
