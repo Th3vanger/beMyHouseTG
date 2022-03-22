@@ -2,6 +2,9 @@ let Parser = require('rss-parser');
 let parser = new Parser();
 const { Telegraf } = require('telegraf')
 require('dotenv').config()
+const { Pool, Client } = require('pg')
+const connectionString = process.env.DATABASE_URL
+
 async function analyzeFeed(){
     let feed= []
     let boolEnd = false
@@ -25,5 +28,8 @@ async function analyzeFeed(){
 
 }
 const bot = new Telegraf(process.env.BOT_TOKEN)
-bot.start((ctx) => ctx.reply('Welcome'))
+bot.start((ctx) => {
+
+      ctx.reply('Welcome')
+})
 bot.launch()
