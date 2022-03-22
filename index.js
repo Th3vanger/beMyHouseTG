@@ -1,6 +1,6 @@
 let Parser = require('rss-parser');
 let parser = new Parser();
-const { Telegraf } = require('telegraf')
+const { Composer } = require('micro-bot');
 require('dotenv').config()
 const { Pool, Client } = require('pg')
 const connectionString = process.env.DATABASE_URL
@@ -27,9 +27,9 @@ async function analyzeFeed(){
    return feed
 
 }
-const bot = new Telegraf(process.env.BOT_TOKEN)
+const bot = new Composer()
 bot.start((ctx) => {
 
       ctx.reply('Welcome')
 })
-bot.launch()
+module.exports = bot
