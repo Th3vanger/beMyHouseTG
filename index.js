@@ -39,15 +39,15 @@ async function analyzeFeed(){
 const bot = new Composer()
 bot.start((ctx) => {
    client.connect();
-   client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
-      if (err) throw err;
-      for (let row of res.rows) {
-         ctx.reply(JSON.stringify(row))
-      // console.log(JSON.stringify(row));
-      }
-      client.end();
-   });
-
+   // client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
+   //    if (err) throw err;
+   //    for (let row of res.rows) {
+   //       // ctx.reply(JSON.stringify(row))
+   //    // console.log(JSON.stringify(row));
+   //    }
+   //    client.end();
+   // });
+   ctx.reply("girolamo")
       
 })
 module.exports = bot
