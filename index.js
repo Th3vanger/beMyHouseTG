@@ -53,7 +53,7 @@ bot.start((ctx) => {
 bot.hears('/getFeed', async ({ reply }) => {
    const test = await analyzeFeed()
    console.log(test.length)
-   reply(test.length)
+   reply(test[1])
 })
 module.exports = bot
 
