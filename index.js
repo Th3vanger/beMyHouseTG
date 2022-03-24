@@ -59,6 +59,15 @@ bot.hears('/getFeed', async (ctx) => {
 
    ctx.reply('vai a vede barbone')
 })
+bot.hears('/getFeedPos', async (ctx) => {
+   
+ 
+   sql = format(`select * from house `)
+   await client.connect()
+   const res = await client.query(sql)
+   console.log(JSON.stringify(res))
+   ctx.reply(JSON.stringify(res))
+})
 
 //sql = format('INSERT INTO t (name, age) VALUES %L', myNestedArray); 
 // bot.launch()
