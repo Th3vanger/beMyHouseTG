@@ -76,12 +76,12 @@ bot.start((ctx) => {
    ctx.reply("girolamo")
       
 })
-bot.hears('/getFeedImmobiliare', async (ctx) => {
+bot.hears('/get_feed_immobiliare', async (ctx) => {
    const feedImmobiliare = await getFeedImmobiliare()
    if (feedImmobiliare.length === 0 ) return ctx.reply("Non ci sono nuovi immobili da Immobiliare.it ")
    feedImmobiliare.forEach(element => {ctx.reply(element)})
 })
-bot.hears('/saveFeedImmobiliare', async (ctx) => {
+bot.hears('/save_feed_immobiliare', async (ctx) => {
    let feedImmobiliare = await getFeedImmobiliare()
    if (feedImmobiliare.length === 0) return ctx.reply("Non ci sono immobili da salvare su Immobiliare.it ")
    feedImmobiliare = feedImmobiliare.map(element => [element,0])
