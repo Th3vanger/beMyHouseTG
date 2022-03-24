@@ -5,16 +5,11 @@ const format = require('node-pg-format');
 
 const { Client } = require('pg');
 require('dotenv').config()
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false
-  }
-});
+
 const HTMLParser = require('node-html-parser');
 
 
-async function analyzeFeed(){
+async function getFeedImmobiliare(){
    let parser = new Parser();
     let feed= []
     let boolEnd = false
@@ -25,7 +20,7 @@ async function analyzeFeed(){
             let url = baseUrl
             if (count > 1 ) url = `${baseUrl}&pag=${count}`
             const result =  await parser.parseURL(url);
-            feed.push(...result.items.map(element => [element.link,0]))
+            feed.push(...result.items.map(element => element.link))
          //console.log("test")
          } catch (error) {
             boolEnd = true
@@ -33,11 +28,41 @@ async function analyzeFeed(){
          count++
     }
     // questa roba penso(credo) si possa ottimizzare con una promise all rimane il dubbio che non so come prendere tutte le pagine 
-    return feed
+    
+   
+    const client = new Client({
+       connectionString: process.env.DATABASE_URL,
+       ssl: {
+         rejectUnauthorized: false
+       }
+     });
+    await client.connect()
+    sql = format(`select * from house `)
+    let feedSaved = await client.query(sql)
+    feedSaved = feedSaved.rows
+    feedSaved= feedSaved.map(element => element.url)
+    let difference = feed.filter(x => !feedSaved.includes(x));
+    await client.end()
+    
+    return difference
 
 }
-// const bot = new Composer()
-const bot = new Telegraf(process.env.BOT_TOKEN)
+
+async function saveFeedImmobiliare(feedImmobiliare){
+   const sql = format(`INSERT INTO house (url,site) VALUES %L`, feedImmobiliare)
+   const client = new Client({
+       connectionString: process.env.DATABASE_URL,
+       ssl: {
+         rejectUnauthorized: false
+       }
+     });
+   await client.connect()
+   await client.query(sql)
+   await client.end()
+   return "Immobili salvati con successo"
+}
+const bot = new Composer()
+// const bot = new Telegraf(process.env.BOT_TOKEN)
 bot.start((ctx) => {
    //client.connect();
    // client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
@@ -51,31 +76,20 @@ bot.start((ctx) => {
    ctx.reply("girolamo")
       
 })
-bot.hears('/getFeed', async (ctx) => {
-   console.log("start")
-   let feedImmbiliare = await analyzeFeed()
-   await client.connect()
-   sql = format(`select * from house `)
-   let feedSaved = await client.query(sql)
-   feedSaved = feedSaved.rows
-   feedImmbiliare= feedSaved.map(element => [element.url,0])
-   // let difference = feedImmbiliare.filter(x => !feedSaved.includes(x));
-   // console.log(difference)
-   client.end()
-
-
-
-
-   // sql = format(`INSERT INTO house (url,site) VALUES %L`, b)
-
-   // await client.query(sql)
-
-  // ctx.reply(difference)
+bot.hears('/getFeedImmobiliare', async (ctx) => {
+   const feedImmobiliare = await getFeedImmobiliare()
+   if (feedImmobiliare.length === 0 ) return ctx.reply("Non ci sono nuovi immobili da Immobiliare.it ")
+   feedImmobiliare.forEach(element => {ctx.reply(element)})
+})
+bot.hears('/saveFeedImmobiliare', async (ctx) => {
+   let feedImmobiliare = await getFeedImmobiliare()
+   if (feedImmobiliare.length === 0) return ctx.reply("Non ci sono immobili da salvare su Immobiliare.it ")
+   feedImmobiliare = feedImmobiliare.map(element => [element,0])
+   ctx.reply(await saveFeedImmobiliare(feedImmobiliare))
 })
 
-
 //sql = format('INSERT INTO t (name, age) VALUES %L', myNestedArray); 
- bot.launch()
-// module.exports = bot
+//  bot.launch()
+module.exports = bot
 
 
