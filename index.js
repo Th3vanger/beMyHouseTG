@@ -4,6 +4,7 @@ const { Telegraf } = require('telegraf')
 const format = require('node-pg-format');
 
 const { Client } = require('pg');
+require('dotenv').config()
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
   ssl: {
@@ -11,7 +12,7 @@ const client = new Client({
   }
 });
 const HTMLParser = require('node-html-parser');
-require('dotenv').config()
+
 
 async function analyzeFeed(){
    let parser = new Parser();
@@ -35,8 +36,8 @@ async function analyzeFeed(){
     return feed
 
 }
-const bot = new Composer()
-// const bot = new Telegraf(process.env.BOT_TOKEN)
+// const bot = new Composer()
+const bot = new Telegraf(process.env.BOT_TOKEN)
 bot.start((ctx) => {
    //client.connect();
    // client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
@@ -51,17 +52,16 @@ bot.start((ctx) => {
       
 })
 bot.hears('/getFeed', async (ctx) => {
+   console.log("start")
    let feedImmbiliare = await analyzeFeed()
- 
    await client.connect()
    sql = format(`select * from house `)
    let feedSaved = await client.query(sql)
    feedSaved = feedSaved.rows
-   feedSaved= feedSaved.map(element => [element.url,0])
-   let difference = feedImmbiliare.filter(x => !feedSaved.includes(x));
-   console.log(difference)
-
-
+   feedImmbiliare= feedSaved.map(element => [element.url,0])
+   // let difference = feedImmbiliare.filter(x => !feedSaved.includes(x));
+   // console.log(difference)
+   client.end()
 
 
 
@@ -70,12 +70,12 @@ bot.hears('/getFeed', async (ctx) => {
 
    // await client.query(sql)
 
-   ctx.reply(difference)
+  // ctx.reply(difference)
 })
 
 
 //sql = format('INSERT INTO t (name, age) VALUES %L', myNestedArray); 
-// bot.launch()
-module.exports = bot
+ bot.launch()
+// module.exports = bot
 
 
