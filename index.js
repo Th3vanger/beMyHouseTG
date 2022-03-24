@@ -55,7 +55,8 @@ bot.hears('/getFeed', async (ctx) => {
  
    await client.connect()
    sql = format(`select * from house `)
-   let feedSaved = await client.query(sql).rows
+   let feedSaved = await client.query(sql)
+   feedSaved = feedSaved.rows
    feedSaved= feedSaved.map(element => [element.url,0])
    let difference = feedImmbiliare.filter(x => !feedSaved.includes(x));
    console.log(difference)
