@@ -24,7 +24,7 @@ async function analyzeFeed(){
             let url = baseUrl
             if (count > 1 ) url = `${baseUrl}&pag=${count}`
             const result =  await parser.parseURL(url);
-            feed.push(...result.items.map(element => element.link))
+            feed.push(...result.items.map(element => [element.link,0]))
          //console.log("test")
          } catch (error) {
             boolEnd = true
@@ -51,22 +51,27 @@ bot.start((ctx) => {
       
 })
 bot.hears('/getFeed', async (ctx) => {
-   const test = await analyzeFeed()
-   const b = test.map(element => [element,0])
-   sql = format(`INSERT INTO house (url,site) VALUES %L`, b)
-   await client.connect()
-   await client.query(sql)
-
-   ctx.reply('vai a vede barbone')
-})
-bot.hears('/getFeedPos', async (ctx) => {
-   
+   let feedImmbiliare = await analyzeFeed()
  
-   sql = format(`select * from house `)
    await client.connect()
-   const res = await client.query(sql)
-   ctx.reply(JSON.stringify(res.rows[0]))
+   sql = format(`select * from house `)
+   let feedSaved = await client.query(sql).rows
+   feedSaved= feedSaved.map(element => [element.url,0])
+   let difference = feedImmbiliare.filter(x => !feedSaved.includes(x));
+   console.log(difference)
+
+
+
+
+
+
+   // sql = format(`INSERT INTO house (url,site) VALUES %L`, b)
+
+   // await client.query(sql)
+
+   ctx.reply(difference)
 })
+
 
 //sql = format('INSERT INTO t (name, age) VALUES %L', myNestedArray); 
 // bot.launch()
