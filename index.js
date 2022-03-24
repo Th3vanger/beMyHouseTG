@@ -13,7 +13,7 @@ async function getFeedImmobiliare(){
    let parser = new Parser();
     let feed= []
     let boolEnd = false
-    const baseUrl = 'https://www.immobiliare.it/vendita-case/lucca/?criterio=dataModifica&ordine=desc&prezzoMassimo=180000&localiMinimo=3&idMZona[]=62&idMZona[]=10409&idMZona[]=10411&idMZona[]=64&idQuartiere[]=147&idQuartiere[]=12409&idQuartiere[]=205&idQuartiere[]=12405&mode=rss'
+    const baseUrl = 'https://www.immobiliare.it/vendita-case/lucca/?criterio=dataModifica&ordine=desc&prezzoMassimo=180000&localiMinimo=3&idMZona[]=10409&idMZona[]=10411&idMZona[]=64&idMZona[]=62&idQuartiere[]=12409&idQuartiere[]=205&idQuartiere[]=12405&idQuartiere[]=190&mode=rss'
     let count = 1
     while (!boolEnd){
         try {
