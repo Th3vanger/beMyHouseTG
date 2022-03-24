@@ -1,20 +1,20 @@
 let Parser = require('rss-parser');
-let parser = new Parser();
 const { Composer } = require('micro-bot');
-require('dotenv').config()
-const { Client } = require('pg');
+const { Telegraf } = require('telegraf')
+const format = require('node-pg-format');
 
+const { Client } = require('pg');
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false
   }
 });
-
-
-
+const HTMLParser = require('node-html-parser');
+require('dotenv').config()
 
 async function analyzeFeed(){
+   let parser = new Parser();
     let feed= []
     let boolEnd = false
     const baseUrl = 'https://www.immobiliare.it/vendita-case/lucca/?criterio=dataModifica&ordine=desc&prezzoMassimo=180000&localiMinimo=3&idMZona[]=62&idMZona[]=10409&idMZona[]=10411&idMZona[]=64&idQuartiere[]=147&idQuartiere[]=12409&idQuartiere[]=205&idQuartiere[]=12405&mode=rss'
@@ -24,19 +24,19 @@ async function analyzeFeed(){
             let url = baseUrl
             if (count > 1 ) url = `${baseUrl}&pag=${count}`
             const result =  await parser.parseURL(url);
-            feed.push(...result.items)
-         console.log("test")
+            feed.push(...result.items.map(element => element.link))
+         //console.log("test")
          } catch (error) {
             boolEnd = true
          }
          count++
     }
-
     // questa roba penso(credo) si possa ottimizzare con una promise all rimane il dubbio che non so come prendere tutte le pagine 
-   return feed
+    return feed
 
 }
 const bot = new Composer()
+// const bot = new Telegraf(process.env.BOT_TOKEN)
 bot.start((ctx) => {
    //client.connect();
    // client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
@@ -50,11 +50,18 @@ bot.start((ctx) => {
    ctx.reply("girolamo")
       
 })
-bot.hears('/getFeed', async ({ reply }) => {
+bot.hears('/getFeed', async (ctx) => {
    const test = await analyzeFeed()
-   console.log(test.length)
-   reply(test[1])
+   const b = test.map(element => [element,0])
+   sql = format(`INSERT INTO house (url,site) VALUES %L`, b)
+   await client.connect()
+   await client.query(sql)
+
+   ctx.reply('vai a vede barbone')
 })
+
+//sql = format('INSERT INTO t (name, age) VALUES %L', myNestedArray); 
+// bot.launch()
 module.exports = bot
 
 
