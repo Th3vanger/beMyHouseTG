@@ -1,5 +1,5 @@
 let Parser = require('rss-parser');
-const { Composer } = require('micro-bot');
+// const { Composer } = require('micro-bot');
 const { Telegraf } = require('telegraf')
 const format = require('node-pg-format');
 
@@ -61,21 +61,9 @@ async function saveFeedImmobiliare(feedImmobiliare){
    await client.end()
    return "Immobili salvati con successo"
 }
-const bot = new Composer()
-// const bot = new Telegraf(process.env.BOT_TOKEN)
-bot.start((ctx) => {
-   //client.connect();
-   // client.query('SELECT table_schema,table_name FROM information_schema.tables;', (err, res) => {
-   //    if (err) throw err;
-   //    for (let row of res.rows) {
-   //       // ctx.reply(JSON.stringify(row))
-   //    // console.log(JSON.stringify(row));
-   //    }
-   //    client.end();
-   // });
-   ctx.reply("girolamo")
-      
-})
+// const bot = new Composer()
+const bot = new Telegraf(process.env.BOT_TOKEN)
+
 bot.hears('/get_feed_immobiliare', async (ctx) => {
    const feedImmobiliare = await getFeedImmobiliare()
    if (feedImmobiliare.length === 0 ) return ctx.reply("Non ci sono nuovi immobili da Immobiliare.it ")
@@ -88,8 +76,12 @@ bot.hears('/save_feed_immobiliare', async (ctx) => {
    ctx.reply(await saveFeedImmobiliare(feedImmobiliare))
 })
 
-//sql = format('INSERT INTO t (name, age) VALUES %L', myNestedArray); 
-//  bot.launch()
-module.exports = bot
+
+ bot.launch()
+
+ // Enable graceful stop
+process.once('SIGINT', () => bot.stop('SIGINT'));
+process.once('SIGTERM', () => bot.stop('SIGTERM'));
+
 
 
