@@ -1,7 +1,7 @@
 let Parser = require('rss-parser');
 // const { Composer } = require('micro-bot');
 const { Telegraf } = require('telegraf')
-const format = require('node-pg-format');
+const { format } = require('node-pg-format');
 
 const { Client } = require('pg');
 require('dotenv').config()
@@ -37,7 +37,7 @@ async function getFeedImmobiliare(){
        }
      });
     await client.connect()
-    sql = format(`select * from house `)
+    sql = `select * from house `
     let feedSaved = await client.query(sql)
     feedSaved = feedSaved.rows
     feedSaved= feedSaved.map(element => element.url)
@@ -78,10 +78,11 @@ bot.hears('/save_feed_immobiliare', async (ctx) => {
 
 
  bot.launch()
+ console.log('bot started')
 
  // Enable graceful stop
-process.once('SIGINT', () => bot.stop('SIGINT'));
-process.once('SIGTERM', () => bot.stop('SIGTERM'));
+// process.once('SIGINT', () => bot.stop('SIGINT'));
+// process.once('SIGTERM', () => bot.stop('SIGTERM'));
 
 
 
